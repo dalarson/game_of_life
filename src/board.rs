@@ -1,15 +1,19 @@
-const HEIGHT: usize = 10;
-const WIDTH: usize = 10;
+const HEIGHT: usize = 20;
+const WIDTH: usize = 40;
 
 pub struct Board {
-    game_board: [[u8; HEIGHT]; WIDTH]
+    game_board: [[u8; WIDTH]; HEIGHT]
 }
 
 impl Board {
 
     pub fn print_board(&self){
-        for (i, row) in self.game_board.iter().enumerate() {
-            println!("{:?}", self.game_board[i]);
+        for y in 0..HEIGHT {
+            for x in 0..WIDTH {
+                if self.game_board[y][x] != 0 { print!("X"); }
+                else { print!(" "); }
+            }
+            println!();
         }
     }
 
@@ -19,11 +23,32 @@ impl Board {
 }
 
 pub fn init_board() -> Board {
-        let new_board = Board{
-            game_board: [[0; HEIGHT]; WIDTH]
-        };
-        return new_board;
-    }
+    let new_board = Board{
+        game_board: [
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH],
+            [1; WIDTH],
+            [0; WIDTH]
+        ]};
+    return new_board;
+}
+
 
 
 
