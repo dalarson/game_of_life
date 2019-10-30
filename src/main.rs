@@ -1,15 +1,19 @@
 use std::fs;
 
-const HEIGHT: usize = 7;
-const WIDTH: usize = 10;
+mod board;
+
 type Point = (usize, usize);
 
-
 fn main() {
+
     let filepath = "src/input.txt".to_string();
-    let game_board = init_board_from_file(filepath);
-    print!("{:?}", game_board);
-    print_board(game_board);
+    let game_board = board::Board{matrix: init_board_from_file(filepath)};
+    let game_board_ref = &game_board;
+    game_board_ref.print();
+    game_board_ref.evolve();
+    game_board_ref.print();
+
+
 
 
 }
@@ -36,7 +40,7 @@ fn init_board_from_file(filepath: String) -> Vec<Point> {
     }
 
     // return newly created sparce matrix
-    return vec;
+    vec
 }
 
 /*
@@ -44,20 +48,26 @@ fn init_board_from_file(filepath: String) -> Vec<Point> {
  * Initializes a new empty sparse array and returns it
  */
 fn init_board() -> Vec<Point> {
-    let vec = Vec::new();
-    return vec;
+    Vec::new()
 }   
 
-fn print_board(board: Vec<Point>) {
-    let mut blank_board: [[u8; HEIGHT]; WIDTH] = [[0; HEIGHT]; WIDTH];
-    for i in board {
-        blank_board[i.0][i.1] = 1;
-    }
-    for i in 0..HEIGHT {
-        for j in 0..WIDTH {
-            print!("{}", if blank_board[j][i] == 0 {" "} else {"X"});
-        }
-        print!("\n");
-    }
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
