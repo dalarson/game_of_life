@@ -7,8 +7,8 @@ type Point = (usize, usize);
 fn main() {
 
     let filepath = "src/input.txt".to_string();
-    let game_board = board::Board{matrix: init_board_from_file(filepath)};
-    let game_board_ref = &game_board;
+    let mut game_board = board::Board{matrix: init_board_from_file(filepath)};
+    let game_board_ref = &mut game_board;
     game_board_ref.print();
     game_board_ref.evolve();
     game_board_ref.print();

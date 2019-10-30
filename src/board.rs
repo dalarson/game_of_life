@@ -8,10 +8,13 @@ pub struct Board {
 
 impl Board {
 
-	pub fn evolve(&self) {
+	pub fn evolve(&mut self) {
 		for point in &self.matrix {
         	println!("{:?}", point); // need to accumulate neighbors of all points
    		}
+
+   		self.matrix.remove(1);
+   		self.matrix.remove(4);
 	}
 
 	pub fn print(&self) {
