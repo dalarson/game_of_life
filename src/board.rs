@@ -9,8 +9,8 @@ pub struct Board {
 }
 
 impl Board {
-
-	pub fn evolve(&mut self) {
+	// returns 0 if game is over
+	pub fn evolve(&mut self) -> usize {
 		let mut new_matrix: Vec<(usize, usize)> = Vec::new();
 		let possible_cells = &self.get_possible_cells();
 		// println!("Possible cells: {:?}", possible_cells);
@@ -44,6 +44,7 @@ impl Board {
 			}
 		}
 		self.matrix = new_matrix;
+		self.matrix.len()
 
 	}
 

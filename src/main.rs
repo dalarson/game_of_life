@@ -12,15 +12,6 @@ fn main() {
     println!("{}", game_board);
     game_board.evolve();
     println!("{}", game_board);
-    game_board.evolve();
-    println!("{}", game_board);
-    game_board.evolve();
-    println!("{}", game_board);
-    game_board.evolve();
-    println!("{}", game_board);
-    game_board.evolve();
-    println!("{}", game_board);
-
 
 
 }
