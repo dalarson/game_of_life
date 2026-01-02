@@ -1,160 +1,172 @@
-use std::fmt;
-use std::cmp;
-
-const HEIGHT: usize = 10;
-const WIDTH: usize = 10;
+use rand::Rng;
+use std::{fmt, i8, io};
 
 pub struct Board {
-	pub matrix: Vec<(usize, usize)>
+    width: isize,
+    height: isize,
+    // this is a vector of tuples representing coordinates on the board
+    matrix: Vec<(isize, isize)>,
+    age: i128,
 }
 
 impl Board {
-	// returns 0 if game is over
-	pub fn evolve(&mut self) -> usize {
-		let mut new_matrix: Vec<(usize, usize)> = Vec::new();
-		let possible_cells = &self.get_possible_cells();
-		// println!("Possible cells: {:?}", possible_cells);
-		// println!("Length: {}", possible_cells.len());
-		for cell in possible_cells {
-			// println!("{}, {}", cell.0, cell.1);
-			let neighbors = &self.get_neighbors(&cell);
-			// println!("{:?}", neighbors);
-			// println!("{}", &self);
-			let intersection = get_intersection(&self.get_neighbors(&cell), &self.matrix);
-			// println!("{:?}", intersection);
-			let len = intersection.len();
-			// println!("{}", len);
-			if (&self.matrix).into_iter().any(|x| x.0 == cell.0 && x.1 == cell.1) {
-				// println!("Living!");
-				// we have a living cell here
-				if len == 2 || len == 3 {
-					// live on
-					// println!("Live on!");
-					new_matrix.push((cell.0, cell.1));
-				}
-			}
-			else { 
-				// println!("Dead!");
-				// means dead cell
-				if len == 3 {
-					// birth
-					// println!("Birth!");
-					new_matrix.push((cell.0, cell.1));
-				}
-			}
-		}
-		self.matrix = new_matrix;
-		self.matrix.len()
+    pub fn new(width: isize, height: isize) -> Self {
+        // initialize a random vector of initial points
+        let mut rng = rand::rng();
+        let count = rng.random_range(150..=250);
+        let initial_matrix = (0..count)
+            .map(|_| {
+                let x = rng.random_range(0..width as i8) as isize;
+                let y = rng.random_range(0..height as i8) as isize;
+                (x, y)
+            })
+            .collect();
 
-	}
+        // create board object
+        Self {
+            width,
+            height,
+            matrix: initial_matrix,
+            age: 0,
+        }
+    }
 
-	// returns vector of union of all immediate neighbors of all active cells
-	fn get_possible_cells(&self) -> Vec<(usize, usize)> {
-		let mut possible_cells: Vec<(usize, usize)> = Vec::new();
-		for cell in &self.matrix {
-			let neighbors = &self.get_neighbors(&cell).to_owned();
-			possible_cells.push((cell.0, cell.1));
-			possible_cells = get_union(&possible_cells, neighbors);
-			// println!("{:?}", possible_cells);
-			// need to create list of possible cells which includes all neighbors and all living cells
-			// iterate through that list and check for overlap of those neighbors with original board
-			// that will result in correct shit
+    // run a single generation of the board and replace the state of the game board.
+    // returns false if the board is empty after evolution, true otherwise
+    pub fn evolve(&mut self) -> bool {
+        // print game board
+        println!("Generation {}:\n{}", self.age, self);
+        // create new board
+        let mut new_matrix = Vec::new();
+        for x in 0..self.width {
+            for y in 0..self.height {
+                if self.evolve_cell(x, y) {
+                    new_matrix.push((x, y));
+                }
+            }
+        }
+        self.matrix = new_matrix;
+        self.age += 1;
+        if self.matrix.is_empty() {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-		}
-		// return created vector
-		possible_cells
-	}
-	
-	// Does NOT include self
-	fn get_neighbors(&self, cell: &(usize, usize)) -> Vec<(usize, usize)> {
-		let mut neighbors: Vec<(usize, usize)> = Vec::new();
-			// println!("{:?}", cell);
-			for x in (cmp::max(0, (cell.0 as isize) - 1)as usize)..cmp::min(WIDTH, cell.0 + 2) { 
-				for y in (cmp::max(0, (cell.1 as isize) - 1) as usize)..cmp::min(HEIGHT, cell.1 + 2) {
-					if cell.0 != x || cell.1 != y {
-						neighbors.push((x, y));
-					}
-				}
-			}
-		neighbors
-	}
-	
-}
+    // return whether the cell at (x, y) will be alive or dead in the next generation
+    pub fn evolve_cell(&self, x: isize, y: isize) -> bool {
+        // get array of neighboring alive cells
+        let neighbors: Vec<(isize, isize)> = self.get_neighboring_cells(x, y);
 
-// helper
+        // apply rules on conway's game of life
+        let alive = self.matrix.contains(&(x, y));
+        return if alive {
+            neighbors.len() == 2 || neighbors.len() == 3
+        } else {
+            neighbors.len() == 3
+        };
+    }
 
-fn get_union(vec1: &Vec<(usize, usize)>, vec2: &Vec<(usize, usize)>) -> Vec<(usize, usize)> { // this should work?
-		let mut union: Vec<(usize, usize)> = Vec::new();
-		// TODO: check which vec is smaller
-		// Also make this not suck
-		// println!("Vec1: {:?}\nVec2: {:?}", vec1, vec2);
-		if vec2.len() > vec1.len() {
-			return get_union(vec2, vec1);
-		}
-		else {
-			for cell in vec1 {
-				if union.contains(cell) == false { // TODO: contains() is by reference not value
-					union.push((cell.0, cell.1));
-					// println!("Pushing cell: {}, {}", cell.0, cell.1);
-				}
-			}
-			for cell in vec2 {
-				if union.contains(cell) == false {
-					// println!("Pushing cell: {}, {}", cell.0, cell.1);c
-					union.push((cell.0, cell.1));
-				}
-			}
-		}
-		
+    // returns a vector of coordinate tuples of living cells in the board that neighbor the given cell coordinates
+    pub fn get_neighboring_cells(&self, x: isize, y: isize) -> Vec<(isize, isize)> {
+        self.matrix
+            .iter()
+            .filter(|&cell| {
+                ((cell.0 - x).abs() <= 1)
+                    && ((cell.1 - y).abs() <= 1)
+                    && !(cell.0 == x && cell.1 == y)
+            })
+            .cloned()
+            .collect()
+    }
 
-		union
-	}
-
-fn get_intersection(vec1: &Vec<(usize, usize)>, vec2: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
-	let mut intersection: Vec<(usize, usize)> = Vec::new();
-
-	if vec2.len() > vec1.len() {
-		return get_intersection(vec2, vec1);
-	}
-	else {
-		for cell in vec1 {
-			if vec2.into_iter().any(|x| x.0 == cell.0 && x.1 == cell.1) && (intersection.contains(cell) == false) {
-				intersection.push((cell.0, cell.1));
-			}
-		}
-		for cell in vec2 {
-			if vec1.into_iter().any(|x| x.0 == cell.0 && x.1 == cell.1) && (intersection.contains(cell) == false) {
-				intersection.push((cell.0, cell.1));
-			}
-		}
-
-	}
-	intersection
+    pub fn start(&mut self) {
+        let mut is_game_running: bool = self.evolve();
+        while is_game_running {
+            is_game_running = self.evolve();
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read line");
+        }
+    }
 }
 
 impl fmt::Display for Board {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {	
-		let mut blank_board: [[u8; HEIGHT]; WIDTH] = [[0; HEIGHT]; WIDTH];
-	    for i in &self.matrix {
-	        blank_board[i.0][i.1] = 1;
-	    }
-	    for i in 0..HEIGHT {
-	        for j in 0..WIDTH {
-	            write!(f, "{}", if blank_board[j][i] == 0 {" "} else {"X"})?;
-	        }
-	        write!(f, "\n")?;
-	    }
-	    Ok(())
-	}
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // populate active cells
+        let mut board_matrix = vec![vec![0; self.width as usize]; self.height as usize];
+        for point in self.matrix.iter() {
+            board_matrix[point.0 as usize][point.1 as usize] = 1;
+        }
+
+        // print the board
+        for row in board_matrix.iter() {
+            for cell in row.iter() {
+                let symbol = if *cell == 1 { '█' } else { ' ' };
+                write!(f, "{}", symbol)?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
+    }
 }
 
+#[cfg(test)]
 
+mod tests {
+    use super::*;
 
+    // sample board for testing
+    //	0 0 0 0 0
+    //  0 1 1 1 0
+    //  0 0 1 0 0
+    //	0 1 0 1 0
+    //	0 0 0 0 0
+    // (1, 1), (1, 2), (1, 3), (2, 2), (3, 1), (3, 3)
 
+    fn generate_test_board() -> Board {
+        let mut board = Board::new(5, 5);
+        board.matrix = vec![(1, 1), (1, 2), (1, 3), (2, 2), (3, 1), (3, 3)];
+        return board;
+    }
 
+    // neighboring cells of (2, 2) are
+    // (1, 1), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2), (3, 3)
+    #[test]
+    fn test_get_neighboring_cells() {
+        let board = generate_test_board();
+        assert_eq!(
+            board.get_neighboring_cells(2, 2),
+            vec![(1, 1), (1, 2), (1, 3), (3, 1), (3, 3)]
+        );
+        assert_eq!(
+            board.get_neighboring_cells(0, 2),
+            vec![(1, 1), (1, 2), (1, 3)]
+        );
+    }
 
-
-
-
-
-
+    // newly alive cells: (0,2), (3,2)
+    // surviving cells: (1,1), (1,2), (1,3)
+    // dying cells: (2, 2), (3,1)
+    #[test]
+    fn test_evolve_cell() {
+        let board = generate_test_board();
+        // newly born cells
+        assert_eq!(board.evolve_cell(0, 2), true);
+        assert_eq!(board.evolve_cell(3, 2), true);
+        // surviving cells
+        assert_eq!(board.evolve_cell(1, 1), true);
+        assert_eq!(board.evolve_cell(1, 2), true);
+        assert_eq!(board.evolve_cell(1, 3), true);
+        // dying cells
+        assert_eq!(board.evolve_cell(2, 2), false);
+        assert_eq!(board.evolve_cell(3, 1), false);
+        // edge cases
+        assert_eq!(board.evolve_cell(0, 0), false);
+        assert_eq!(board.evolve_cell(4, 4), false);
+        assert_eq!(board.evolve_cell(4, 0), false);
+        assert_eq!(board.evolve_cell(0, 4), false);
+    }
+}
