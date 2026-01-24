@@ -1,0 +1,14 @@
+.square {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.alive {
+    background-color: #000;
+}
+
+.dead {
+    background-color: #fff;
+}
