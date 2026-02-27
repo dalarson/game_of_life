@@ -1,0 +1,12 @@
+{
+  "name": "game-of-life",
+  "private": true,
+  "scripts": {
+    "build:wasm": "cd server && wasm-pack build --target web --out-dir ../game-of-life-client/pkg",
+    "install:client": "cd game-of-life-client && npm install",
+    "build:client": "cd game-of-life-client && npm run build",
+    "dev": "cd game-of-life-client && npm run dev",
+    "setup": "npm run build:wasm && npm run install:client",
+    "start": "npm run setup && npm run dev"
+  }
+}
