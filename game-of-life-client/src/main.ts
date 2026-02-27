@@ -14,33 +14,64 @@ const PRESETS: Record<string, Pattern | "random"> = {
   random: "random",
   clear: [],
   glider: [
-    [0, 1], [1, 2], [2, 0], [2, 1], [2, 2],
+    [0, 1],
+    [1, 2],
+    [2, 0],
+    [2, 1],
+    [2, 2],
   ],
   "glider-gun": [
     // Gosper Glider Gun
-    [0,24],
-    [1,22],[1,24],
-    [2,12],[2,13],[2,20],[2,21],[2,34],[2,35],
-    [3,11],[3,15],[3,20],[3,21],[3,34],[3,35],
-    [4,0],[4,1],[4,10],[4,16],[4,20],[4,21],
-    [5,0],[5,1],[5,10],[5,14],[5,16],[5,17],[5,22],[5,24],
-    [6,10],[6,16],[6,24],
-    [7,11],[7,15],
-    [8,12],[8,13],
+    [0, 24],
+    [1, 22],
+    [1, 24],
+    [2, 12],
+    [2, 13],
+    [2, 20],
+    [2, 21],
+    [2, 34],
+    [2, 35],
+    [3, 11],
+    [3, 15],
+    [3, 20],
+    [3, 21],
+    [3, 34],
+    [3, 35],
+    [4, 0],
+    [4, 1],
+    [4, 10],
+    [4, 16],
+    [4, 20],
+    [4, 21],
+    [5, 0],
+    [5, 1],
+    [5, 10],
+    [5, 14],
+    [5, 16],
+    [5, 17],
+    [5, 22],
+    [5, 24],
+    [6, 10],
+    [6, 16],
+    [6, 24],
+    [7, 11],
+    [7, 15],
+    [8, 12],
+    [8, 13],
   ],
   pulsar: (() => {
     const offsets: Pattern = [];
     const rows = [
-      [-6, [-4,-3,-2, 2,3,4]],
-      [-4, [-6,-1, 1,6]],
-      [-3, [-6,-1, 1,6]],
-      [-2, [-6,-1, 1,6]],
-      [-1, [-4,-3,-2, 2,3,4]],
-      [1,  [-4,-3,-2, 2,3,4]],
-      [2,  [-6,-1, 1,6]],
-      [3,  [-6,-1, 1,6]],
-      [4,  [-6,-1, 1,6]],
-      [6,  [-4,-3,-2, 2,3,4]],
+      [-6, [-4, -3, -2, 2, 3, 4]],
+      [-4, [-6, -1, 1, 6]],
+      [-3, [-6, -1, 1, 6]],
+      [-2, [-6, -1, 1, 6]],
+      [-1, [-4, -3, -2, 2, 3, 4]],
+      [1, [-4, -3, -2, 2, 3, 4]],
+      [2, [-6, -1, 1, 6]],
+      [3, [-6, -1, 1, 6]],
+      [4, [-6, -1, 1, 6]],
+      [6, [-4, -3, -2, 2, 3, 4]],
     ] as [number, number[]][];
     for (const [r, cols] of rows) {
       for (const c of cols) offsets.push([r, c]);
@@ -49,25 +80,40 @@ const PRESETS: Record<string, Pattern | "random"> = {
   })(),
   lwss: [
     // Lightweight Spaceship
-    [0,1],[0,4],
-    [1,0],
-    [2,0],[2,4],
-    [3,0],[3,1],[3,2],[3,3],
+    [0, 1],
+    [0, 4],
+    [1, 0],
+    [2, 0],
+    [2, 4],
+    [3, 0],
+    [3, 1],
+    [3, 2],
+    [3, 3],
   ],
   acorn: [
-    [0,1],
-    [1,3],
-    [2,0],[2,1],[2,4],[2,5],[2,6],
+    [0, 1],
+    [1, 3],
+    [2, 0],
+    [2, 1],
+    [2, 4],
+    [2, 5],
+    [2, 6],
   ],
   "r-pentomino": [
-    [0,1],[0,2],
-    [1,0],[1,1],
-    [2,1],
+    [0, 1],
+    [0, 2],
+    [1, 0],
+    [1, 1],
+    [2, 1],
   ],
   diehard: [
-    [0,6],
-    [1,0],[1,1],
-    [2,1],[2,5],[2,6],[2,7],
+    [0, 6],
+    [1, 0],
+    [1, 1],
+    [2, 1],
+    [2, 5],
+    [2, 6],
+    [2, 7],
   ],
 };
 
@@ -100,7 +146,7 @@ function createUniverse(presetName: string): Universe {
 let universe: Universe;
 let wasmMemory: WebAssembly.Memory;
 let animationId: number | null = null;
-let playing = true;
+let playing = false;
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
@@ -128,7 +174,11 @@ function drawGrid(): void {
 
 function drawCells(): void {
   const cellsPtr = universe.cells_ptr();
-  const cells = new Uint8Array(wasmMemory.buffer, cellsPtr, UNIVERSE_WIDTH * UNIVERSE_HEIGHT);
+  const cells = new Uint8Array(
+    wasmMemory.buffer,
+    cellsPtr,
+    UNIVERSE_WIDTH * UNIVERSE_HEIGHT,
+  );
 
   // Batch alive and dead cells into two fills for performance
   ctx.beginPath();
@@ -136,7 +186,12 @@ function drawCells(): void {
   for (let row = 0; row < UNIVERSE_HEIGHT; row++) {
     for (let col = 0; col < UNIVERSE_WIDTH; col++) {
       if (cells[row * UNIVERSE_WIDTH + col] === 1) {
-        ctx.fillRect(col * CELL_SIZE + 1, row * CELL_SIZE + 1, CELL_SIZE - 1, CELL_SIZE - 1);
+        ctx.fillRect(
+          col * CELL_SIZE + 1,
+          row * CELL_SIZE + 1,
+          CELL_SIZE - 1,
+          CELL_SIZE - 1,
+        );
       }
     }
   }
@@ -146,7 +201,12 @@ function drawCells(): void {
   for (let row = 0; row < UNIVERSE_HEIGHT; row++) {
     for (let col = 0; col < UNIVERSE_WIDTH; col++) {
       if (cells[row * UNIVERSE_WIDTH + col] === 0) {
-        ctx.fillRect(col * CELL_SIZE + 1, row * CELL_SIZE + 1, CELL_SIZE - 1, CELL_SIZE - 1);
+        ctx.fillRect(
+          col * CELL_SIZE + 1,
+          row * CELL_SIZE + 1,
+          CELL_SIZE - 1,
+          CELL_SIZE - 1,
+        );
       }
     }
   }
@@ -188,20 +248,30 @@ function getCellCoords(event: MouseEvent): [number, number] {
 }
 
 function setCellValue(row: number, col: number, value: 0 | 1): void {
-  if (row < 0 || row >= UNIVERSE_HEIGHT || col < 0 || col >= UNIVERSE_WIDTH) return;
+  if (row < 0 || row >= UNIVERSE_HEIGHT || col < 0 || col >= UNIVERSE_WIDTH)
+    return;
   const cellsPtr = universe.cells_ptr();
-  const cells = new Uint8Array(wasmMemory.buffer, cellsPtr, UNIVERSE_WIDTH * UNIVERSE_HEIGHT);
+  const cells = new Uint8Array(
+    wasmMemory.buffer,
+    cellsPtr,
+    UNIVERSE_WIDTH * UNIVERSE_HEIGHT,
+  );
   cells[row * UNIVERSE_WIDTH + col] = value;
 }
 
 canvas.addEventListener("mousedown", (event) => {
   isDragging = true;
   const [row, col] = getCellCoords(event);
-  if (row < 0 || row >= UNIVERSE_HEIGHT || col < 0 || col >= UNIVERSE_WIDTH) return;
+  if (row < 0 || row >= UNIVERSE_HEIGHT || col < 0 || col >= UNIVERSE_WIDTH)
+    return;
 
   // Toggle the first cell and use its new value as the paint value for the drag
   const cellsPtr = universe.cells_ptr();
-  const cells = new Uint8Array(wasmMemory.buffer, cellsPtr, UNIVERSE_WIDTH * UNIVERSE_HEIGHT);
+  const cells = new Uint8Array(
+    wasmMemory.buffer,
+    cellsPtr,
+    UNIVERSE_WIDTH * UNIVERSE_HEIGHT,
+  );
   const idx = row * UNIVERSE_WIDTH + col;
   paintValue = cells[idx] === 1 ? 0 : 1;
   cells[idx] = paintValue;
@@ -253,7 +323,8 @@ resetBtn.addEventListener("click", () => {
 });
 
 // Preset selection
-const presetButtons = document.querySelectorAll<HTMLButtonElement>("[data-preset]");
+const presetButtons =
+  document.querySelectorAll<HTMLButtonElement>("[data-preset]");
 
 presetButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -280,7 +351,6 @@ async function start(): Promise<void> {
 
   drawGrid();
   drawCells();
-  play();
 }
 
 start();

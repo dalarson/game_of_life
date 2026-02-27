@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game of Life</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
       body {
         display: flex;
         flex-direction: column;
@@ -16,17 +20,35 @@
         color: #eee;
         font-family: system-ui, sans-serif;
       }
-      h1 { margin-bottom: 12px; font-size: 1.4rem; }
-      .main-layout { display: flex; gap: 16px; align-items: flex-start; }
-      canvas { border: 1px solid #444; }
-      .controls { margin-top: 12px; display: flex; gap: 8px; justify-content: center; }
+      h1 {
+        margin-bottom: 12px;
+        font-size: 1.4rem;
+      }
+      .main-layout {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      canvas {
+        border: 1px solid #444;
+      }
+      .controls {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
       .presets {
         display: flex;
         flex-direction: column;
         gap: 6px;
         min-width: 160px;
       }
-      .presets h2 { font-size: 0.95rem; margin-bottom: 4px; color: #aaa; }
+      .presets h2 {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #aaa;
+      }
       button {
         padding: 6px 16px;
         font-size: 0.9rem;
@@ -36,9 +58,17 @@
         color: #eee;
         border-radius: 4px;
       }
-      button:hover { background: #333; }
-      .presets button { width: 100%; text-align: left; }
-      .presets button.active { border-color: #00ff88; color: #00ff88; }
+      button:hover {
+        background: #333;
+      }
+      .presets button {
+        width: 100%;
+        text-align: left;
+      }
+      .presets button.active {
+        border-color: #00ff88;
+        color: #00ff88;
+      }
     </style>
   </head>
   <body>
@@ -59,7 +89,7 @@
       </div>
     </div>
     <div class="controls">
-      <button id="play-pause">⏸ Pause</button>
+      <button id="play-pause">▶ Play</button>
       <button id="step">Step</button>
       <button id="reset">Reset</button>
     </div>
