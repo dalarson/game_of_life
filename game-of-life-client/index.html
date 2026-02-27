@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game of Life</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #111;
+        color: #eee;
+        font-family: system-ui, sans-serif;
+      }
+      h1 { margin-bottom: 12px; font-size: 1.4rem; }
+      .main-layout { display: flex; gap: 16px; align-items: flex-start; }
+      canvas { border: 1px solid #444; }
+      .controls { margin-top: 12px; display: flex; gap: 8px; justify-content: center; }
+      .presets {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 160px;
+      }
+      .presets h2 { font-size: 0.95rem; margin-bottom: 4px; color: #aaa; }
+      button {
+        padding: 6px 16px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 1px solid #555;
+        background: #222;
+        color: #eee;
+        border-radius: 4px;
+      }
+      button:hover { background: #333; }
+      .presets button { width: 100%; text-align: left; }
+      .presets button.active { border-color: #00ff88; color: #00ff88; }
+    </style>
+  </head>
+  <body>
+    <h1>Conway's Game of Life</h1>
+    <div class="main-layout">
+      <canvas id="game-canvas"></canvas>
+      <div class="presets">
+        <h2>Presets</h2>
+        <button data-preset="random" class="active">🎲 Random</button>
+        <button data-preset="clear">⬛ Clear</button>
+        <button data-preset="glider">↗ Glider</button>
+        <button data-preset="glider-gun">🔫 Glider Gun</button>
+        <button data-preset="pulsar">💫 Pulsar</button>
+        <button data-preset="lwss">🚀 Spaceship</button>
+        <button data-preset="acorn">🌰 Acorn</button>
+        <button data-preset="r-pentomino">✳️ R-pentomino</button>
+        <button data-preset="diehard">💀 Diehard</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="play-pause">⏸ Pause</button>
+      <button id="step">Step</button>
+      <button id="reset">Reset</button>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
