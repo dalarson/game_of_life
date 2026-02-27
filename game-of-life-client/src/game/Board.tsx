@@ -156,7 +156,7 @@ export const Board = () => {
   }, [boardSize, handleClick, isAlive]);
 
   return (
-    <div>
+    <div className={"controls"}>
       <input
         type="number"
         placeholder="Enter board size"
@@ -166,14 +166,14 @@ export const Board = () => {
           }
         }}
       />
-      {boardSize && (
-        <div>
+      {boardSize && boardSize !== 0 && (
+        <div className={"game-buttons"}>
           <button onClick={handleEvolve}>Evolve</button>
           <button onClick={handleReset}>Reset</button>
           <button onClick={handleRandomize}>Randomize</button>
           <button onClick={go}>Go!</button>
           <button onClick={stop}>Stop!!</button>
-          <div>{age}</div>
+          <div>Current age: {age}</div>
           {grid}
         </div>
       )}
