@@ -1,5 +1,4 @@
 /target
 **/*.rs.bk
 node_modules/
-game-of-life-client/pkg/
 server/target
