@@ -5,14 +5,10 @@
     "game-of-life-client"
   ],
   "devDependencies": {
-    "wasm-pack": "^0.13.1"
   },
   "scripts": {
-    "build:wasm": "wasm-pack build ./server --target web --out-dir ../game-of-life-client/pkg",
     "build:client": "npm run build -w game-of-life-client",
     "dev": "npm run dev -w game-of-life-client",
-    "setup": "npm run build:wasm",
-    "postinstall": "npm run setup",
     "start": "npm run dev"
   }
 }
